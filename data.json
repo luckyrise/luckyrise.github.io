@@ -28858,364 +28858,164 @@
     "科创BU",
     "车墩"
   ],
-  "districts": [
-    "松江"
-  ],
   "branch_list": [
     {
       "branch": "G60",
-      "district": "松江",
       "count": 251,
       "total_amount": 1172882.64,
       "total_qty": 83.9,
       "customer_count": 127,
-      "top_scene": "0.0",
-      "top_channel": "一事一议",
-      "scene_dist": {
-        "0.0": 250,
-        "街镇社区": 1
-      },
-      "channel_dist": {
-        "系统": 104,
-        "一事一议": 147
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "科创BU",
-      "district": "松江",
       "count": 187,
       "total_amount": 1244442.64,
       "total_qty": 206.4,
       "customer_count": 39,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 187
-      },
-      "channel_dist": {
-        "一事一议": 52,
-        "系统": 135
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "政务BU",
-      "district": "松江",
       "count": 131,
       "total_amount": 6042003.65,
       "total_qty": 145.5,
       "customer_count": 16,
-      "top_scene": "街镇社区",
-      "top_channel": "系统",
-      "scene_dist": {
-        "街镇社区": 92,
-        "0.0": 39
-      },
-      "channel_dist": {
-        "一事一议": 25,
-        "系统": 106
-      }
+      "top_scene": "街镇社区"
     },
     {
       "branch": "九亭",
-      "district": "松江",
       "count": 129,
       "total_amount": 214556.8,
       "total_qty": 59.7,
       "customer_count": 64,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 86,
-        "街镇社区": 43
-      },
-      "channel_dist": {
-        "系统": 90,
-        "一事一议": 39
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "中山",
-      "district": "松江",
       "count": 115,
       "total_amount": 183262.59,
       "total_qty": 59.9,
       "customer_count": 49,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "街镇社区": 48,
-        "0.0": 67
-      },
-      "channel_dist": {
-        "系统": 95,
-        "一事一议": 20
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "新桥",
-      "district": "松江",
       "count": 109,
       "total_amount": 197067.88,
       "total_qty": 53.8,
       "customer_count": 37,
-      "top_scene": "街镇社区",
-      "top_channel": "系统",
-      "scene_dist": {
-        "街镇社区": 65,
-        "0.0": 44
-      },
-      "channel_dist": {
-        "系统": 97,
-        "一事一议": 12
-      }
+      "top_scene": "街镇社区"
     },
     {
       "branch": "公共服务BU",
-      "district": "松江",
       "count": 88,
       "total_amount": 1081025.0,
       "total_qty": 83.4,
       "customer_count": 11,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 82,
-        "街镇社区": 6
-      },
-      "channel_dist": {
-        "系统": 75,
-        "一事一议": 13
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "新城",
-      "district": "松江",
       "count": 87,
       "total_amount": 1256538.76,
       "total_qty": 41.3,
       "customer_count": 24,
-      "top_scene": "街镇社区",
-      "top_channel": "系统",
-      "scene_dist": {
-        "街镇社区": 61,
-        "0.0": 26
-      },
-      "channel_dist": {
-        "系统": 83,
-        "一事一议": 4
-      }
+      "top_scene": "街镇社区"
     },
     {
       "branch": "车墩",
-      "district": "松江",
       "count": 85,
       "total_amount": 905840.6,
       "total_qty": 62.2,
       "customer_count": 54,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 70,
-        "街镇社区": 15
-      },
-      "channel_dist": {
-        "系统": 45,
-        "一事一议": 40
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "城厢",
-      "district": "松江",
       "count": 77,
       "total_amount": 1013372.08,
       "total_qty": 64.5,
       "customer_count": 24,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 39,
-        "街镇社区": 37,
-        "云眼监控": 1
-      },
-      "channel_dist": {
-        "系统": 70,
-        "一事一议": 7
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "石湖荡",
-      "district": "松江",
       "count": 68,
       "total_amount": 174788.84,
       "total_qty": 52.3,
       "customer_count": 10,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "街镇社区": 5,
-        "0.0": 63
-      },
-      "channel_dist": {
-        "系统": 63,
-        "一事一议": 5
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "泗泾",
-      "district": "松江",
       "count": 57,
       "total_amount": 424000.84,
       "total_qty": 116.4,
       "customer_count": 28,
-      "top_scene": "街镇社区",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 25,
-        "街镇社区": 31,
-        "云眼监控": 1
-      },
-      "channel_dist": {
-        "系统": 43,
-        "一事一议": 14
-      }
+      "top_scene": "街镇社区"
     },
     {
       "branch": "泖新",
-      "district": "松江",
       "count": 40,
       "total_amount": 950760.16,
       "total_qty": 26.0,
       "customer_count": 11,
-      "top_scene": "0.0",
-      "top_channel": "一事一议",
-      "scene_dist": {
-        "0.0": 38,
-        "街镇社区": 2
-      },
-      "channel_dist": {
-        "系统": 16,
-        "一事一议": 24
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "工业BU",
-      "district": "松江",
       "count": 38,
       "total_amount": 683185.0,
       "total_qty": 40.4,
       "customer_count": 13,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 38
-      },
-      "channel_dist": {
-        "一事一议": 10,
-        "系统": 28
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "洞泾",
-      "district": "松江",
       "count": 35,
       "total_amount": 1115709.02,
       "total_qty": 105.9,
       "customer_count": 23,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 35
-      },
-      "channel_dist": {
-        "系统": 25,
-        "一事一议": 10
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "佘山",
-      "district": "松江",
       "count": 35,
       "total_amount": 88816.44,
       "total_qty": 21.2,
       "customer_count": 23,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 32,
-        "街镇社区": 3
-      },
-      "channel_dist": {
-        "系统": 33,
-        "一事一议": 2
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "叶榭",
-      "district": "松江",
       "count": 33,
       "total_amount": 90258.48,
       "total_qty": 29.1,
       "customer_count": 14,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "0.0": 33
-      },
-      "channel_dist": {
-        "一事一议": 7,
-        "系统": 26
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "小昆山",
-      "district": "松江",
       "count": 31,
       "total_amount": 524039.92,
       "total_qty": 62.6,
       "customer_count": 17,
-      "top_scene": "0.0",
-      "top_channel": "系统",
-      "scene_dist": {
-        "云眼监控": 1,
-        "街镇社区": 9,
-        "0.0": 21
-      },
-      "channel_dist": {
-        "一事一议": 15,
-        "系统": 16
-      }
+      "top_scene": "0.0"
     },
     {
       "branch": "其他",
-      "district": "松江",
       "count": 5,
       "total_amount": 2000.0,
       "total_qty": 15.4,
       "customer_count": 4,
-      "top_scene": "0.0",
-      "top_channel": "一事一议",
-      "scene_dist": {
-        "0.0": 5
-      },
-      "channel_dist": {
-        "一事一议": 3,
-        "系统": 2
-      }
-    }
-  ],
-  "district_list": [
-    {
-      "district": "松江",
-      "count": 1601,
-      "total_amount": 17364551.34,
-      "total_qty": 1329.9,
-      "branch_count": 19,
-      "customer_count": 559
+      "top_scene": "0.0"
     }
   ],
   "total": {
     "count": 1601,
     "amount": 17364551.34,
     "qty": 1329.9
-  }
+  },
+  "updated": "2026-04-19 18:21:54"
 }
