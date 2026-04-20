@@ -100,7 +100,7 @@ let allData=[],filteredData=[],searchFilteredData=[],currentBranch='全部',curr
 const PAGE_SIZE=50,barChart=null,pieChart=null;
 
 async function loadData(){
-  const resp=await fetch('data.json');
+  const resp=await fetch('data.json?t='+Date.now());
   const json=await resp.json();
   allData=json.rows.map(r=>({date:r.DAT_DATE||'',zone:r['落地区局']||'',branch:r['落地支局']||'(未知)',manager:r['促销客户经理']||'',managerId:r['促销工号']||'',customer:r['客户名称']||'',sceneBig:r['场景大类']||'',sceneSmall:r['场景小类OLD']||'',via:r['通过方式']||'',bizNo:r['商机编号']||'',path:r['发展路径']||'',qty:parseFloat(r['报表实物量'])||0,sales:parseFloat(r['报表销售额'])||0,reportType:r['通报类型']||'',assetId:r['资产ID']||'',groupNo:r['群头编号']||''}));
   document.getElementById('totalAll').textContent=allData.length.toLocaleString();
