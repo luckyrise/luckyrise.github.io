@@ -97,7 +97,7 @@
 </div>
 <script>
 let allData=[],filteredData=[],searchFilteredData=[],currentBranch='全部',currentPage=1;
-const PAGE_SIZE=50,barChart=null,pieChart=null;
+const PAGE_SIZE=50;
 
 async function loadData(){
   const resp=await fetch('data.json?t='+Date.now());
