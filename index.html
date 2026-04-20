@@ -98,13 +98,19 @@
 <script>
 let allData=[],filteredData=[],searchFilteredData=[],currentBranch='全部',currentPage=1;
 const PAGE_SIZE=50;
+let barChartInst=null,pieChartInst=null;
 
 async function loadData(){
-  const resp=await fetch('data.json?t='+Date.now());
-  const json=await resp.json();
-  allData=json.rows.map(r=>({date:r.DAT_DATE||'',zone:r['落地区局']||'',branch:r['落地支局']||'(未知)',manager:r['促销客户经理']||'',managerId:r['促销工号']||'',customer:r['客户名称']||'',sceneBig:r['场景大类']||'',sceneSmall:r['场景小类OLD']||'',via:r['通过方式']||'',bizNo:r['商机编号']||'',path:r['发展路径']||'',qty:parseFloat(r['报表实物量'])||0,sales:parseFloat(r['报表销售额'])||0,reportType:r['通报类型']||'',assetId:r['资产ID']||'',groupNo:r['群头编号']||''}));
-  document.getElementById('totalAll').textContent=allData.length.toLocaleString();
-  buildFilterButtons();filterByBranch('全部');
+  try{
+    const resp=await fetch('data.json?t='+Date.now());
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const json=await resp.json();
+    allData=json.rows.map(r=>({date:r.DAT_DATE||'',zone:r['落地区局']||'',branch:r['落地支局']||'(未知)',manager:r['促销客户经理']||'',managerId:r['促销工号']||'',customer:r['客户名称']||'',sceneBig:r['场景大类']||'',sceneSmall:r['场景小类OLD']||'',via:r['通过方式']||'',bizNo:r['商机编号']||'',path:r['发展路径']||'',qty:parseFloat(r['报表实物量'])||0,sales:parseFloat(r['报表销售额'])||0,reportType:r['通报类型']||'',assetId:r['资产ID']||'',groupNo:r['群头编号']||''}));
+    document.getElementById('totalAll').textContent=allData.length.toLocaleString();
+    buildFilterButtons();filterByBranch('全部');
+  }catch(e){
+    document.body.innerHTML='<div style="padding:80px;text-align:center;color:#ef4444;"><h3>数据加载失败</h3><p>'+e.message+'</p><p style="font-size:12px;color:#999;">请检查网络连接，或等待片刻后刷新</p></div>';
+  }
 }
 function getBranchCounts(){const c={};allData.forEach(r=>{c[r.branch]=(c[r.branch]||0)+1});return c;}
 function buildFilterButtons(){
@@ -143,21 +149,32 @@ function getBranchAgg(d){
   return Object.entries(m).map(([branch,v])=>({branch,...v})).sort((a,b)=>b.count-a.count);
 }
 function updateCharts(){
+  if(typeof echarts==='undefined'){console.warn('ECharts not loaded');return;}
   const agg=getBranchAgg(filteredData),branches=agg.map(a=>a.branch),counts=agg.map(a=>a.count),salesArr=agg.map(a=>a.sales);
-  if(!window.barChart)window.barChart=echarts.init(document.getElementById('barChart'));
-  window.barChart.setOption({tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>p[0].name+'<br/>记录数:'+p[0].value+'条<br/>销售额:¥'+(p[1].value/10000).toFixed(1)+'万'},
-    legend:{data:['记录数','销售额'],top:5},grid:{left:'3%',right:'4%',bottom:'3%',top:'35px',containLabel:true},
+  if(!barChartInst){
+    barChartInst=echarts.init(document.getElementById('barChart'));
+    window.addEventListener('resize',()=>{if(barChartInst)barChartInst.resize();});
+  }
+  barChartInst.setOption({
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>p[0].name+'<br/>记录数:'+p[0].value+'条<br/>销售额:¥'+(p[1].value/10000).toFixed(1)+'万'},
+    legend:{data:['记录数','销售额'],top:5},
+    grid:{left:'3%',right:'4%',bottom:'3%',top:'35px',containLabel:true},
     xAxis:{type:'category',data:branches,axisLabel:{fontSize:10,rotate:30},nameLocation:'middle',nameGap:30},
     yAxis:[{type:'value',name:'记录数',axisLabel:{fontSize:10}},{type:'value',name:'销售额(元)',axisLabel:{fontSize:10,formatter:v=>v/10000+'万'}}],
-    series:[{name:'记录数',type:'bar',data:counts,itemStyle:{color:'#3b82f6',borderRadius:[4,4,0,0]}},{name:'销售额',type:'bar',yAxisIndex:1,data:salesArr,itemStyle:{color:'#f59e0b',borderRadius:[4,4,0,0]}}]},true);
-  if(!window.pieChart)window.pieChart=echarts.init(document.getElementById('pieChart'));
+    series:[{name:'记录数',type:'bar',data:counts,itemStyle:{color:'#3b82f6',borderRadius:[4,4,0,0]}},{name:'销售额',type:'bar',yAxisIndex:1,data:salesArr,itemStyle:{color:'#f59e0b',borderRadius:[4,4,0,0]}}]
+  },false);
+  if(!pieChartInst){
+    pieChartInst=echarts.init(document.getElementById('pieChart'));
+    window.addEventListener('resize',()=>{if(pieChartInst)pieChartInst.resize();});
+  }
   const top5=agg.slice(0,6),rest=agg.slice(6),pieData=[...top5.map(a=>({name:a.branch,value:a.sales}))];
   if(rest.length>0)pieData.push({name:'其他',value:rest.reduce((s,a)=>s+a.sales,0)});
-  window.pieChart.setOption({tooltip:{trigger:'item',formatter:p=>p.name+'<br/>¥'+(p.value/10000).toFixed(2)+'万<br/>'+p.percent+'%'},
+  pieChartInst.setOption({
+    tooltip:{trigger:'item',formatter:p=>p.name+'<br/>¥'+(p.value/10000).toFixed(2)+'万<br/>'+p.percent+'%'},
     legend:{orient:'vertical',right:5,top:10,textStyle:{fontSize:10}},
     series:[{type:'pie',radius:['35%','65%'],center:['45%','55%'],label:{fontSize:10,formatter:'{b}:{d}%'},data:pieData,itemStyle:{borderRadius:4}}],
-    color:['#1a56db','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#6b7280']},true);
-  window.addEventListener('resize',()=>{window.barChart&&window.barChart.resize();window.pieChart&&window.pieChart.resize();});
+    color:['#1a56db','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#6b7280']
+  },false);
 }
 function updateTable(){
   const total=searchFilteredData.length;
@@ -180,7 +197,7 @@ function updateTable(){
 }
 function prevPage(){if(currentPage>1){currentPage--;updateTable();}}
 function nextPage(){const t=Math.ceil(searchFilteredData.length/PAGE_SIZE);if(currentPage<t){currentPage++;updateTable();}}
-loadData().catch(e=>{document.body.innerHTML='<div class="no-data" style="padding:80px"><div>数据加载失败：'+e.message+'</div></div>';});
+loadData();
 </script>
 </body>
 </html>
