@@ -6,151 +6,95 @@
   <title>发展清单查询 - 落地支局筛选</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
-
-    /* ── Header ── */
-    .header { background: linear-gradient(135deg, #1a56db 0%, #0f4c81 100%); color: white; padding: 16px 16px; display: flex; align-items: center; justify-content: space-between; }
-    .header h1 { font-size: 18px; font-weight: 600; letter-spacing: 1px; }
-    .header .subtitle { font-size: 12px; opacity: 0.75; }
-    .header-right { text-align: right; font-size: 12px; opacity: 0.85; }
-
-    /* ── Stats bar ── */
-    .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 12px 16px; background: white; border-bottom: 1px solid #e8e8e8; }
-    .stat-card { background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; border-radius: 10px; padding: 10px 8px; text-align: center; }
-    .stat-card .label { font-size: 11px; color: #60a5fa; font-weight: 500; margin-bottom: 3px; white-space: nowrap; }
-    .stat-card .value { font-size: 20px; font-weight: 700; color: #1e40af; line-height: 1.2; }
-    .stat-card .unit { font-size: 11px; color: #93c5fd; }
-
-    /* ── Filter section ── */
-    .filter-section { padding: 14px 16px 0; background: white; }
-    .filter-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .header { background: linear-gradient(135deg, #1a56db 0%, #0f4c81 100%); color: white; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 22px; font-weight: 600; letter-spacing: 1px; }
+    .header .subtitle { font-size: 13px; opacity: 0.8; }
+    .stats-bar { display: flex; gap: 16px; padding: 16px 32px; background: white; border-bottom: 1px solid #e8e8e8; flex-wrap: wrap; }
+    .stat-card { background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 20px; min-width: 160px; flex: 1; }
+    .stat-card .label { font-size: 12px; color: #60a5fa; font-weight: 500; margin-bottom: 4px; }
+    .stat-card .value { font-size: 24px; font-weight: 700; color: #1e40af; }
+    .filter-section { padding: 20px 32px 0; background: white; }
+    .filter-label { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
     .filter-label .badge { background: #dbeafe; color: #1e40af; font-size: 11px; padding: 1px 7px; border-radius: 10px; }
-    .filter-btns { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 14px; }
-    .filter-btn { padding: 6px 12px; border: 1.5px solid #d1d5db; border-radius: 20px; background: white; color: #4b5563; font-size: 12px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+    .filter-btns { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; }
+    .filter-btn { padding: 7px 16px; border: 1.5px solid #d1d5db; border-radius: 20px; background: white; color: #4b5563; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
     .filter-btn:hover { border-color: #1a56db; color: #1a56db; background: #eff6ff; }
     .filter-btn.active { background: linear-gradient(135deg, #1a56db, #1e40af); color: white; border-color: transparent; }
     .filter-btn .count { background: rgba(255,255,255,0.25); color: inherit; border-radius: 10px; padding: 0 5px; font-size: 11px; }
     .filter-btn:not(.active) .count { background: #e5e7eb; color: #6b7280; }
-
-    /* ── Charts block ── */
-    .charts-block { padding: 16px 16px 0; }
-    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .chart-area { background: white; border-radius: 12px; padding: 14px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .chart-title { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 10px; }
-    #barChart { height: 240px; width: 100%; }
-    #pieChart { height: 240px; width: 100%; }
-
-    /* ── Table section ── */
-    .table-section { margin: 16px; background: white; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-    .table-header .info { font-size: 12px; color: #6b7280; }
+    .content { padding: 16px 32px 32px; display: grid; grid-template-columns: 1fr 380px; gap: 16px; align-items: start; }
+    .chart-area { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .chart-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 16px; }
+    #barChart, #pieChart { height: 280px; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .table-section { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .table-header .info { font-size: 13px; color: #6b7280; }
     .table-header .info strong { color: #1a56db; }
-    .search-box { display: flex; gap: 6px; }
-    .search-box input { padding: 5px 10px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 12px; outline: none; width: 150px; }
+    .search-box { display: flex; gap: 8px; }
+    .search-box input { padding: 6px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; width: 180px; }
     .search-box input:focus { border-color: #1a56db; }
-    .search-box button { padding: 5px 12px; background: #1a56db; color: white; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; }
-    .table-wrap { overflow: auto; max-height: 500px; border: 1px solid #e5e7eb; border-radius: 8px; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px; }
+    .search-box button { padding: 6px 14px; background: #1a56db; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+    .table-wrap { overflow: auto; max-height: 520px; border: 1px solid #e5e7eb; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 900px; }
     thead { position: sticky; top: 0; z-index: 1; }
-    thead th { background: #f8fafc; color: #64748b; font-weight: 600; padding: 9px 10px; text-align: center; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+    thead th { background: #f8fafc; color: #64748b; font-weight: 600; padding: 10px 12px; text-align: center; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
     tbody tr:hover td { background: #f0f7ff; }
-    tbody td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #f1f5f9; color: #334155; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    tbody td { padding: 9px 12px; text-align: center; border-bottom: 1px solid #f1f5f9; color: #334155; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .col-no { color: #94a3b8; font-size: 11px; }
     .col-money { color: #059669; font-weight: 600; }
     .col-qty { color: #1a56db; font-weight: 600; }
-    .tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
     .tag-scene { background: #fef3c7; color: #92400e; }
     .tag-path { background: #dcfce7; color: #166534; }
     .tag-way { background: #ede9fe; color: #5b21b6; }
-    .no-data { padding: 50px; text-align: center; color: #9ca3af; }
-    .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
-    .pagination button { padding: 5px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; font-size: 12px; color: #4b5563; }
+    .no-data { padding: 60px; text-align: center; color: #9ca3af; }
+    .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+    .pagination button { padding: 5px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; font-size: 12px; color: #4b5563; }
     .pagination button:hover:not(:disabled) { border-color: #1a56db; color: #1a56db; }
     .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
     .pagination span { font-size: 12px; color: #6b7280; }
-
-    /* ── Responsive ── */
-    @media (max-width: 900px) {
-      .stats-bar { grid-template-columns: repeat(3, 1fr); }
-      .stat-card .value { font-size: 18px; }
-      .charts-row { grid-template-columns: 1fr; }
-      .table-wrap { max-height: 400px; }
-    }
-    @media (max-width: 600px) {
-      .header { padding: 12px 12px; }
-      .header h1 { font-size: 15px; }
-      .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px 12px; }
-      .stat-card .value { font-size: 17px; }
-      .stat-card .label { font-size: 10px; }
-      .filter-section { padding: 10px 12px 0; }
-      .filter-btns { gap: 5px; }
-      .filter-btn { font-size: 11px; padding: 5px 10px; }
-      .charts-block { padding: 12px 12px 0; }
-      .chart-area { padding: 12px 10px; }
-      #barChart, #pieChart { height: 200px; }
-      .table-section { margin: 12px; padding: 12px; }
-      .search-box input { width: 120px; font-size: 11px; }
-      .search-box button { font-size: 11px; padding: 5px 10px; }
-      .table-header .info { font-size: 11px; }
-      table { font-size: 11px; min-width: 700px; }
-      thead th, tbody td { padding: 7px 8px; }
-    }
-    @media (max-width: 400px) {
-      .stats-bar { grid-template-columns: 1fr 1fr; }
-      .stat-card .value { font-size: 16px; }
-    }
+    @media (max-width: 1100px) { .content { grid-template-columns: 1fr; } .charts-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 <div class="header">
   <div><h1>发展清单查询系统</h1><div class="subtitle">数据来源：标化清单</div></div>
-  <div class="header-right">总记录 <span id="totalAll">-</span> 条</div>
+  <div style="text-align:right; font-size:13px; opacity:0.8;">总记录：<span id="totalAll">-</span> 条</div>
 </div>
-
 <div class="stats-bar" id="statsBar">
-  <div class="stat-card"><div class="label">当前记录数</div><div class="value" id="statCount">-</div></div>
-  <div class="stat-card"><div class="label">当前销售额</div><div class="value" id="statSales">-</div><div class="unit">元</div></div>
-  <div class="stat-card"><div class="label">当前实物量</div><div class="value" id="statQty">-</div></div>
+  <div class="stat-card"><div class="label">当前筛选记录数</div><div class="value" id="statCount">-</div></div>
+  <div class="stat-card"><div class="label">当前筛选销售额</div><div class="value" id="statSales">-</div><div class="unit">元</div></div>
+  <div class="stat-card"><div class="label">当前筛选实物量</div><div class="value" id="statQty">-</div></div>
   <div class="stat-card"><div class="label">客户数</div><div class="value" id="statCustomers">-</div></div>
   <div class="stat-card"><div class="label">客户经理数</div><div class="value" id="statManagers">-</div></div>
 </div>
-
 <div class="filter-section">
-  <div class="filter-label">落地支局筛选 <span class="badge" id="activeBranch">全部</span></div>
+  <div class="filter-label">落地支局筛选<span class="badge" id="activeBranch">全部</span></div>
   <div class="filter-btns" id="filterBtns"></div>
 </div>
-
-<!-- 图表区：并排两图，下方全宽表格 -->
-<div class="charts-block">
-  <div class="charts-row">
-    <div class="chart-area">
-      <div class="chart-title">各支局记录数与销售额</div>
-      <div id="barChart"></div>
+<div class="content">
+  <div>
+    <div class="charts-row">
+      <div class="chart-area"><div class="chart-title">各支局记录数与销售额</div><div id="barChart"></div></div>
+      <div class="chart-area"><div class="chart-title">销售额占比分布</div><div id="pieChart"></div></div>
     </div>
-    <div class="chart-area">
-      <div class="chart-title">销售额占比分布</div>
-      <div id="pieChart"></div>
+  </div>
+  <div class="table-section">
+    <div class="table-header">
+      <div class="info">明细数据 <strong id="tableCount">0</strong> 条</div>
+      <div class="search-box"><input type="text" id="searchInput" placeholder="搜索客户名称/经理..."><button onclick="doSearch()">搜索</button></div>
+    </div>
+    <div class="table-wrap" id="tableWrap"><div class="no-data"><div>请选择落地支局查看明细数据</div></div></div>
+    <div class="pagination" id="pagination" style="display:none;">
+      <button id="btnPrev" onclick="prevPage()">上一页</button>
+      <span id="pageInfo">第 1 页</span>
+      <button id="btnNext" onclick="nextPage()">下一页</button>
     </div>
   </div>
 </div>
-
-<div class="table-section">
-  <div class="table-header">
-    <div class="info">明细数据 <strong id="tableCount">0</strong> 条</div>
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜索客户/经理/场景...">
-      <button onclick="doSearch()">搜索</button>
-    </div>
-  </div>
-  <div class="table-wrap" id="tableWrap"><div class="no-data"><div>请选择落地支局查看明细数据</div></div></div>
-  <div class="pagination" id="pagination" style="display:none;">
-    <button id="btnPrev" onclick="prevPage()">上一页</button>
-    <span id="pageInfo">第 1 页</span>
-    <button id="btnNext" onclick="nextPage()">下一页</button>
-  </div>
-</div>
-
 <script>
 let allData=[],filteredData=[],searchFilteredData=[],currentBranch='全部',currentPage=1;
 const PAGE_SIZE=50;
@@ -161,113 +105,52 @@ async function loadData(){
     const resp=await fetch('data.json?t='+Date.now());
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     const json=await resp.json();
-    allData=json.rows.map(r=>({
-      date:r.DAT_DATE||'',
-      zone:r['落地区局']||'',
-      branch:r['落地支局']||'(未知)',
-      manager:r['促销客户经理']||'',
-      managerId:r['促销工号']||'',
-      customer:r['客户名称']||'',
-      sceneBig:r['场景大类']||'',
-      sceneSmall:r['场景小类OLD']||'',
-      via:r['通过方式']||'',
-      bizNo:r['商机编号']||'',
-      path:r['发展路径']||'',
-      qty:parseFloat(r['报表实物量'])||0,
-      sales:parseFloat(r['报表销售额'])||0,
-      reportType:r['通报类型']||'',
-      assetId:r['资产ID']||'',
-      groupNo:r['群头编号']||''
-    }));
+    allData=json.rows.map(r=>({date:r.DAT_DATE||'',zone:r['落地区局']||'',branch:r['落地支局']||'(未知)',manager:r['促销客户经理']||'',managerId:r['促销工号']||'',customer:r['客户名称']||'',sceneBig:r['场景大类']||'',sceneSmall:r['场景小类OLD']||'',via:r['通过方式']||'',bizNo:r['商机编号']||'',path:r['发展路径']||'',qty:parseFloat(r['报表实物量'])||0,sales:parseFloat(r['报表销售额'])||0,reportType:r['通报类型']||'',assetId:r['资产ID']||'',groupNo:r['群头编号']||''}));
     document.getElementById('totalAll').textContent=allData.length.toLocaleString();
-    buildFilterButtons();
-    filterByBranch('全部');
+    buildFilterButtons();filterByBranch('全部');
   }catch(e){
-    document.body.innerHTML='<div style="padding:80px 20px;text-align:center;color:#ef4444;"><h3>数据加载失败</h3><p>'+e.message+'</p><p style="font-size:12px;color:#999;margin-top:8px;">请检查网络连接，或等待片刻后刷新重试</p></div>';
+    document.body.innerHTML='<div style="padding:80px;text-align:center;color:#ef4444;"><h3>数据加载失败</h3><p>'+e.message+'</p><p style="font-size:12px;color:#999;">请检查网络连接，或等待片刻后刷新</p></div>';
   }
 }
-
-function getBranchCounts(){
-  const c={};
-  allData.forEach(r=>{c[r.branch]=(c[r.branch]||0)+1;});
-  return c;
-}
-
+function getBranchCounts(){const c={};allData.forEach(r=>{c[r.branch]=(c[r.branch]||0)+1});return c;}
 function buildFilterButtons(){
   const cnt=getBranchCounts(),branches=Object.keys(cnt).sort(),container=document.getElementById('filterBtns');
-  const allBtn=document.createElement('button');
-  allBtn.className='filter-btn active';
+  const allBtn=document.createElement('button');allBtn.className='filter-btn active';
   allBtn.innerHTML='全部 <span class="count">'+allData.length+'</span>';
-  allBtn.onclick=()=>filterByBranch('全部');
-  container.appendChild(allBtn);
-  branches.forEach(b=>{
-    const btn=document.createElement('button');
-    btn.className='filter-btn';
+  allBtn.onclick=()=>filterByBranch('全部');container.appendChild(allBtn);
+  branches.forEach(b=>{const btn=document.createElement('button');btn.className='filter-btn';
     btn.innerHTML=b+' <span class="count">'+cnt[b]+'</span>';
-    btn.onclick=()=>filterByBranch(b);
-    container.appendChild(btn);
-  });
+    btn.onclick=()=>filterByBranch(b);container.appendChild(btn);});
 }
-
 function filterByBranch(branch){
-  currentBranch=branch;
-  currentPage=1;
+  currentBranch=branch;currentPage=1;
   filteredData=branch==='全部'?allData:allData.filter(r=>r.branch===branch);
   searchFilteredData=[...filteredData];
-  document.querySelectorAll('.filter-btn').forEach(b=>{
-    const isActive=(branch==='全部'&&b.textContent.startsWith('全部'))||b.textContent.startsWith(branch+' ');
-    b.classList.toggle('active',isActive);
-  });
+  document.querySelectorAll('.filter-btn').forEach(b=>{b.classList.toggle('active',b.textContent.startsWith(branch)||(branch==='全部'&&b.textContent.startsWith('全部')));});
   document.getElementById('activeBranch').textContent=branch==='全部'?'全部':branch;
-  updateStats();
-  updateCharts();
-  updateTable();
+  updateStats();updateCharts();updateTable();
 }
-
 function doSearch(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
-  searchFilteredData=!q?[...filteredData]:filteredData.filter(r=>
-    r.customer.toLowerCase().includes(q)||
-    r.manager.toLowerCase().includes(q)||
-    r.sceneBig.toLowerCase().includes(q)||
-    r.path.toLowerCase().includes(q)||
-    r.sceneSmall.toLowerCase().includes(q)
-  );
-  currentPage=1;
-  updateTable();
+  searchFilteredData=!q?[...filteredData]:filteredData.filter(r=>r.customer.toLowerCase().includes(q)||r.manager.toLowerCase().includes(q)||r.sceneBig.toLowerCase().includes(q)||r.path.toLowerCase().includes(q));
+  currentPage=1;updateTable();
 }
-
 document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
-
 function updateStats(){
-  const c=filteredData.length;
-  const s=filteredData.reduce((a,r)=>a+r.sales,0);
-  const q=filteredData.reduce((a,r)=>a+r.qty,0);
-  const cu=new Set(filteredData.map(r=>r.customer)).size;
-  const mgr=new Set(filteredData.map(r=>r.manager)).size;
+  const c=filteredData.length,s=filteredData.reduce((a,r)=>a+r.sales,0),q=filteredData.reduce((a,r)=>a+r.qty,0),cu=new Set(filteredData.map(r=>r.customer)).size,mgr=new Set(filteredData.map(r=>r.manager)).size;
   document.getElementById('statCount').textContent=c.toLocaleString();
   document.getElementById('statSales').textContent=s>=10000?(s/10000).toFixed(1)+'万':s.toFixed(0);
   document.getElementById('statQty').textContent=q>=10000?(q/10000).toFixed(1)+'万':q.toFixed(0);
   document.getElementById('statCustomers').textContent=cu.toLocaleString();
   document.getElementById('statManagers').textContent=mgr.toLocaleString();
 }
-
 function getBranchAgg(d){
-  const m={};
-  d.forEach(r=>{
-    const b=r.branch;
-    if(!m[b]) m[b]={count:0,sales:0,qty:0};
-    m[b].count++;
-    m[b].sales+=r.sales;
-    m[b].qty+=r.qty;
-  });
+  const m={};d.forEach(r=>{const b=r.branch;if(!m[b])m[b]={count:0,sales:0,qty:0};m[b].count++;m[b].sales+=r.sales;m[b].qty+=r.qty;});
   return Object.entries(m).map(([branch,v])=>({branch,...v})).sort((a,b)=>b.count-a.count);
 }
-
 function updateCharts(){
   if(typeof echarts==='undefined'){console.warn('ECharts not loaded');return;}
   const agg=getBranchAgg(filteredData),branches=agg.map(a=>a.branch),counts=agg.map(a=>a.count),salesArr=agg.map(a=>a.sales);
-
   if(!barChartInst){
     barChartInst=echarts.init(document.getElementById('barChart'));
     window.addEventListener('resize',()=>{if(barChartInst)barChartInst.resize();});
@@ -277,62 +160,34 @@ function updateCharts(){
     legend:{data:['记录数','销售额'],top:5},
     grid:{left:'3%',right:'4%',bottom:'3%',top:'35px',containLabel:true},
     xAxis:{type:'category',data:branches,axisLabel:{fontSize:10,rotate:30},nameLocation:'middle',nameGap:30},
-    yAxis:[
-      {type:'value',name:'记录数',axisLabel:{fontSize:10}},
-      {type:'value',name:'销售额(元)',axisLabel:{fontSize:10,formatter:v=>v/10000+'万'}}
-    ],
-    series:[
-      {name:'记录数',type:'bar',data:counts,itemStyle:{color:'#3b82f6',borderRadius:[4,4,0,0]}},
-      {name:'销售额',type:'bar',yAxisIndex:1,data:salesArr,itemStyle:{color:'#f59e0b',borderRadius:[4,4,0,0]}}
-    ]
+    yAxis:[{type:'value',name:'记录数',axisLabel:{fontSize:10}},{type:'value',name:'销售额(元)',axisLabel:{fontSize:10,formatter:v=>v/10000+'万'}}],
+    series:[{name:'记录数',type:'bar',data:counts,itemStyle:{color:'#3b82f6',borderRadius:[4,4,0,0]}},{name:'销售额',type:'bar',yAxisIndex:1,data:salesArr,itemStyle:{color:'#f59e0b',borderRadius:[4,4,0,0]}}]
   },false);
-
   if(!pieChartInst){
     pieChartInst=echarts.init(document.getElementById('pieChart'));
     window.addEventListener('resize',()=>{if(pieChartInst)pieChartInst.resize();});
   }
-  const top5=agg.slice(0,6),rest=agg.slice(6),pieData=[...top5.map(a=>({name:a.branch,value:a.sales}))];
-  if(rest.length>0) pieData.push({name:'其他',value:rest.reduce((s,a)=>s+a.sales,0)});
+  // 环形图按销售额排序取TOP6，而不是按记录数
+  const pieAgg=[...agg].sort((a,b)=>b.sales-a.sales),top6=pieAgg.slice(0,6),rest=pieAgg.slice(6);
+  const pieData=[...top6.map(a=>({name:a.branch,value:a.sales}))];
+  if(rest.length>0)pieData.push({name:'其他',value:rest.reduce((s,a)=>s+a.sales,0)});
   pieChartInst.setOption({
     tooltip:{trigger:'item',formatter:p=>p.name+'<br/>¥'+(p.value/10000).toFixed(2)+'万<br/>'+p.percent+'%'},
     legend:{orient:'vertical',right:5,top:10,textStyle:{fontSize:10}},
-    series:[{
-      type:'pie',
-      radius:['35%','65%'],
-      center:['45%','55%'],
-      label:{fontSize:10,formatter:'{b}:{d}%'},
-      data:pieData,
-      itemStyle:{borderRadius:4}
-    }],
+    series:[{type:'pie',radius:['35%','65%'],center:['45%','55%'],label:{fontSize:10,formatter:'{b}:{d}%'},data:pieData,itemStyle:{borderRadius:4}}],
     color:['#1a56db','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#6b7280']
   },false);
 }
-
 function updateTable(){
   const total=searchFilteredData.length;
   document.getElementById('tableCount').textContent=total.toLocaleString();
-  if(total===0){
-    document.getElementById('tableWrap').innerHTML='<div class="no-data"><div>无匹配数据</div></div>';
-    document.getElementById('pagination').style.display='none';
-    return;
-  }
+  if(total===0){document.getElementById('tableWrap').innerHTML='<div class="no-data"><div>无匹配数据</div></div>';document.getElementById('pagination').style.display='none';return;}
   const totalPages=Math.ceil(total/PAGE_SIZE);
-  if(currentPage>totalPages) currentPage=totalPages;
+  if(currentPage>totalPages)currentPage=totalPages;
   const start=(currentPage-1)*PAGE_SIZE,pageData=searchFilteredData.slice(start,start+PAGE_SIZE);
   let html='<table><thead><tr><th>#</th><th>日期</th><th>落地支局</th><th>客户经理</th><th>客户名称</th><th>场景大类</th><th>发展路径</th><th>通过方式</th><th>实物量</th><th>销售额(元)</th></tr></thead><tbody>';
   pageData.forEach((r,i)=>{
-    html+='<tr>\
-      <td class="col-no">'+(start+i+1)+'</td>\
-      <td>'+r.date+'</td>\
-      <td><span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:11px">'+r.branch+'</span></td>\
-      <td>'+r.manager+'</td>\
-      <td style="text-align:left;max-width:160px" title="'+r.customer+'">'+r.customer+'</td>\
-      <td><span class="tag tag-scene">'+r.sceneBig+'</span></td>\
-      <td><span class="tag tag-path">'+r.path+'</span></td>\
-      <td><span class="tag tag-way">'+r.via+'</span></td>\
-      <td class="'+(r.qty>0?'col-qty':'')+'">'+(r.qty>0?r.qty:'-')+'</td>\
-      <td class="'+(r.sales>0?'col-money':'')+'">'+(r.sales>0?'¥'+r.sales.toLocaleString():'-')+'</td>\
-    </tr>';
+    html+='<tr><td class="col-no">'+(start+i+1)+'</td><td>'+r.date+'</td><td><span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:11px">'+r.branch+'</span></td><td>'+r.manager+'</td><td style="text-align:left;max-width:180px" title="'+r.customer+'">'+r.customer+'</td><td><span class="tag tag-scene">'+r.sceneBig+'</span></td><td><span class="tag tag-path">'+r.path+'</span></td><td><span class="tag tag-way">'+r.via+'</span></td><td class="'+(r.qty>0?'col-qty':'')+'">'+(r.qty>0?r.qty:'-')+'</td><td class="'+(r.sales>0?'col-money':'')+'">'+(r.sales>0?'¥'+r.sales.toLocaleString():'-')+'</td></tr>';
   });
   html+='</tbody></table>';
   document.getElementById('tableWrap').innerHTML=html;
@@ -342,10 +197,8 @@ function updateTable(){
   document.getElementById('btnNext').disabled=currentPage>=totalPages;
   document.getElementById('pageInfo').textContent='第 '+currentPage+' / '+totalPages+' 页，共 '+total+' 条';
 }
-
 function prevPage(){if(currentPage>1){currentPage--;updateTable();}}
 function nextPage(){const t=Math.ceil(searchFilteredData.length/PAGE_SIZE);if(currentPage<t){currentPage++;updateTable();}}
-
 loadData();
 </script>
 </body>
