@@ -167,15 +167,15 @@ function updateCharts(){
     pieChartInst=echarts.init(document.getElementById('pieChart'));
     window.addEventListener('resize',()=>{if(pieChartInst)pieChartInst.resize();});
   }
-  // 环形图按销售额排序取TOP6，而不是按记录数
-  const pieAgg=[...agg].sort((a,b)=>b.sales-a.sales),top6=pieAgg.slice(0,6),rest=pieAgg.slice(6);
-  const pieData=[...top6.map(a=>({name:a.branch,value:a.sales}))];
-  if(rest.length>0)pieData.push({name:'其他',value:rest.reduce((s,a)=>s+a.sales,0)});
+  // 环形图展示全部支局，按销售额排序
+  const pieAgg=[...agg].sort((a,b)=>b.sales-a.sales);
+  const pieData=pieAgg.map(a=>({name:a.branch,value:a.sales}));
+  const totalSales=pieAgg.reduce((s,a)=>s+a.sales,0);
   pieChartInst.setOption({
-    tooltip:{trigger:'item',formatter:p=>p.name+'<br/>¥'+(p.value/10000).toFixed(2)+'万<br/>'+p.percent+'%'},
+    tooltip:{trigger:'item',formatter:p=>p.name+'<br/>¥'+(p.value/10000).toFixed(2)+'万<br/>'+(p.value/totalSales*100).toFixed(1)+'%'},
     legend:{orient:'vertical',right:5,top:10,textStyle:{fontSize:10}},
-    series:[{type:'pie',radius:['35%','65%'],center:['45%','55%'],label:{fontSize:10,formatter:'{b}:{d}%'},data:pieData,itemStyle:{borderRadius:4}}],
-    color:['#1a56db','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#6b7280']
+    series:[{type:'pie',radius:['35%','65%'],center:['45%','55%'],label:{fontSize:9,formatter:p=>p.name+':'+p.percent+'%'},data:pieData,itemStyle:{borderRadius:4}}],
+    color:['#1a56db','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#a855f7','#0ea5e9','#64748b','#78716c','#c2410c','#7c3aed','#059669','#0d9488','#7c3aed']
   },false);
 }
 function updateTable(){
