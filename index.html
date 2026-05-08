@@ -91,6 +91,17 @@
     @media (max-width: 480px) {
       .stats-bar { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* 支局产数完成情况表格 */
+    .zhijut-section { margin-top: 12px; }
+    .zhijut-wrap { overflow-x: auto; border-radius: 8px; -webkit-overflow-scrolling: touch; }
+    .zhijut-table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 900px; }
+    .zhijut-table th { padding: 7px 8px; text-align: center; white-space: nowrap; border: 1px solid rgba(255,255,255,0.2); }
+    .zhijut-table td { padding: 6px 8px; text-align: center; border: 1px solid #e8e8e8; white-space: nowrap; }
+    .zhijut-table tbody tr:hover td { filter: brightness(0.95); }
+    .zhijut-notes { padding: 8px 12px; font-size: 11px; color: #6b7280; background: white; border-top: 1px solid #f1f5f9; }
+    .zhijut-notes p { margin: 2px 0; }
+    .zhijut-loading { padding: 20px; text-align: center; color: #9ca3af; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -115,7 +126,7 @@
   <div class="filter-btns" id="filterBtns"></div>
 </div>
 
-<div class="main">
+  <div class="main">
   <div class="charts-row">
     <div class="chart-area">
       <div class="chart-title">📊 各支局实物量与销售额</div>
@@ -124,6 +135,15 @@
     <div class="chart-area">
       <div class="chart-title">🥧 销售额占比分布</div>
       <div id="pieChart"></div>
+    </div>
+  </div>
+
+  <div class="zhijut-section">
+    <div class="table-section">
+      <div class="table-header">
+        <div class="info">📋 标化产数完成情况 <strong id="zhijutTitle"></strong></div>
+      </div>
+      <div class="zhijut-wrap" id="zhijutWrap"><div class="zhijut-loading">正在加载产数完成情况...</div></div>
     </div>
   </div>
 
@@ -330,6 +350,19 @@ function prevPage(){if(currentPage>1){currentPage--;updateTable();}}
 function nextPage(){const t=Math.ceil(searchFilteredData.length/PAGE_SIZE);if(currentPage<t){currentPage++;updateTable();}}
 
 loadData();
+
+// 动态加载支局产数完成情况表格
+async function loadZhijutTable(){
+  try{
+    const resp = await fetch('zhijut_table.json?t='+Date.now());
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const json = await resp.json();
+    document.getElementById('zhijutWrap').innerHTML = json.table + (json.notes || '');
+  }catch(e){
+    document.getElementById('zhijutWrap').innerHTML = '<div class="zhijut-loading">加载失败：'+e.message+'</div>';
+  }
+}
+loadZhijutTable();
 </script>
 </body>
 </html>
