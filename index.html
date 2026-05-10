@@ -102,10 +102,51 @@
     .zhijut-notes { padding: 8px 12px; font-size: 11px; color: #6b7280; background: white; border-top: 1px solid #f1f5f9; }
     .zhijut-notes p { margin: 2px 0; }
     .zhijut-loading { padding: 20px; text-align: center; color: #9ca3af; font-size: 13px; }
+
+    /* 登录界面 */
+    #loginOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #1a56db 0%, #0f4c81 100%);
+      display: flex; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .login-box {
+      background: white; border-radius: 16px; padding: 40px 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+      width: 340px; max-width: 90vw;
+    }
+    .login-box h2 { font-size: 22px; color: #1a56db; margin-bottom: 6px; font-weight: 700; }
+    .login-box .login-sub { font-size: 13px; color: #9ca3af; margin-bottom: 28px; }
+    .login-box input[type="password"] {
+      width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db;
+      border-radius: 10px; font-size: 15px; outline: none; text-align: center;
+      letter-spacing: 4px; transition: border-color 0.2s;
+    }
+    .login-box input[type="password"]:focus { border-color: #1a56db; box-shadow: 0 0 0 3px rgba(26,86,219,0.15); }
+    .login-box button {
+      width: 100%; padding: 12px; margin-top: 16px; background: linear-gradient(135deg, #1a56db, #1e40af);
+      color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .login-box button:hover { opacity: 0.9; }
+    .login-error { color: #ef4444; font-size: 12px; margin-top: 10px; min-height: 18px; }
+    .login-hint { font-size: 11px; color: #bbb; margin-top: 18px; }
   </style>
 </head>
 <body>
-<div class="header">
+<!-- 登录界面 -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <h2>🔒 发展清单查询系统</h2>
+    <div class="login-sub">请输入访问密码</div>
+    <input type="password" id="loginPwd" placeholder="请输入密码" autofocus
+           onkeydown="if(event.key==='Enter')doLogin()" />
+    <button onclick="doLogin()">进入系统</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">中国电信 · 标化清单数据平台</div>
+  </div>
+</div>
+
+<div class="header" style="display:none;" id="mainHeader">
   <div>
     <h1>📋 发展清单查询系统</h1>
     <div class="subtitle">数据来源：标化清单</div>
@@ -113,7 +154,7 @@
   <div class="header-right">总记录：<span id="totalAll">-</span> 条</div>
 </div>
 
-<div class="stats-bar" id="statsBar">
+<div class="stats-bar" id="statsBar" style="display:none;">
   <div class="stat-card"><div class="label">记录数</div><div class="value" id="statCount">-</div></div>
   <div class="stat-card"><div class="label">销售额</div><div class="value" id="statSales">-</div></div>
   <div class="stat-card"><div class="label">实物量</div><div class="value" id="statQty">-</div></div>
@@ -121,12 +162,12 @@
   <div class="stat-card"><div class="label">客户经理</div><div class="value" id="statManagers">-</div></div>
 </div>
 
-<div class="filter-section">
+<div class="filter-section" style="display:none;" id="filterSection">
   <div class="filter-label">落地支局筛选<span class="badge" id="activeBranch">全部</span></div>
   <div class="filter-btns" id="filterBtns"></div>
 </div>
 
-  <div class="main">
+  <div class="main" style="display:none;" id="mainContent">
   <div class="charts-row">
     <div class="chart-area">
       <div class="chart-title">📊 各支局实物量与销售额</div>
@@ -349,8 +390,6 @@ function updateTable(){
 function prevPage(){if(currentPage>1){currentPage--;updateTable();}}
 function nextPage(){const t=Math.ceil(searchFilteredData.length/PAGE_SIZE);if(currentPage<t){currentPage++;updateTable();}}
 
-loadData();
-
 // 动态加载支局产数完成情况表格
 async function loadZhijutTable(){
   try{
@@ -362,7 +401,40 @@ async function loadZhijutTable(){
     document.getElementById('zhijutWrap').innerHTML = '<div class="zhijut-loading">加载失败：'+e.message+'</div>';
   }
 }
-loadZhijutTable();
+// ============ 登录逻辑 ============
+const LOGIN_PWD = "sjbh";
+const STORAGE_KEY = "wb_logged";
+
+function showMainContent(){
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('mainHeader').style.display = '';
+  document.getElementById('statsBar').style.display = '';
+  document.getElementById('filterSection').style.display = '';
+  document.getElementById('mainContent').style.display = '';
+  sessionStorage.setItem(STORAGE_KEY, '1');
+  loadData();
+  loadZhijutTable();
+}
+
+function doLogin(){
+  const pwd = document.getElementById('loginPwd').value;
+  const errEl = document.getElementById('loginError');
+  if(pwd === LOGIN_PWD){
+    errEl.textContent = '';
+    showMainContent();
+  }else{
+    errEl.textContent = '密码错误，请重新输入';
+    document.getElementById('loginPwd').value = '';
+    document.getElementById('loginPwd').focus();
+  }
+}
+
+// 页面加载时检查是否已登录
+(function(){
+  if(sessionStorage.getItem(STORAGE_KEY) === '1'){
+    showMainContent();
+  }
+})();
 </script>
 </body>
 </html>
