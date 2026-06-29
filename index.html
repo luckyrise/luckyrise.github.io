@@ -71,6 +71,21 @@
     .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
     .pagination span { font-size: 12px; color: #6b7280; }
 
+    /* 下拉筛选条 */
+    .col-filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 0 6px; border-top: 1px solid #f1f5f9; align-items: center; }
+    .col-filter-item { display: flex; flex-direction: column; gap: 2px; }
+    .col-filter-item label { font-size: 10px; color: #94a3b8; }
+    .col-filter-item select { padding: 4px 6px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 11px; color: #334155; background: white; cursor: pointer; outline: none; min-width: 90px; max-width: 130px; }
+    .col-filter-item select:focus { border-color: #1a56db; }
+    .col-filter-reset { padding: 4px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 11px; color: #6b7280; background: #f8fafc; cursor: pointer; white-space: nowrap; align-self: flex-end; }
+    .col-filter-reset:hover { border-color: #1a56db; color: #1a56db; background: #eff6ff; }
+
+    /* 汇总行 */
+    .detail-summary { font-size: 12px; color: #6b7280; padding: 4px 0 2px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .detail-summary strong { color: #1a56db; }
+    .detail-summary .sum-qty { color: #1a56db; font-weight: 600; }
+    .detail-summary .sum-money { color: #059669; font-weight: 600; }
+
     /* 移动端适配 */
     @media (max-width: 768px) {
       .header { padding: 12px 12px; }
@@ -150,13 +165,26 @@
 
   <div class="table-section">
     <div class="table-header">
-      <div class="info">明细数据 <strong id="tableCount">0</strong> 条</div>
+      <div>
+        <div class="info">明细数据 <strong id="tableCount">0</strong> 条
+          <span id="detailSummaryInline" style="margin-left:10px;font-size:12px;color:#6b7280;"></span>
+        </div>
+      </div>
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="搜索客户/经理/场景...">
         <button onclick="doSearch()">🔍</button>
       </div>
     </div>
-    <div class="table-wrap" id="tableWrap"><div class="no-data"><div>请选择落地支局查看明细数据</div></div></div>
+    <!-- 下拉筛选条 -->
+    <div class="col-filters" id="colFilters">
+      <div class="col-filter-item"><label>落地支局</label><select id="fBranch" onchange="applyColFilters()"><option value="">全部</option></select></div>
+      <div class="col-filter-item"><label>客户经理</label><select id="fManager" onchange="applyColFilters()"><option value="">全部</option></select></div>
+      <div class="col-filter-item"><label>场景大类</label><select id="fScene" onchange="applyColFilters()"><option value="">全部</option></select></div>
+      <div class="col-filter-item"><label>发展路径</label><select id="fPath" onchange="applyColFilters()"><option value="">全部</option></select></div>
+      <div class="col-filter-item"><label>通过方式</label><select id="fVia" onchange="applyColFilters()"><option value="">全部</option></select></div>
+      <button class="col-filter-reset" onclick="resetColFilters()">↺ 重置</button>
+    </div>
+    <div class="table-wrap" id="tableWrap"><div class="no-data"><div>数据加载中...</div></div></div>
     <div class="pagination" id="pagination" style="display:none;">
       <button id="btnPrev" onclick="prevPage()">上一页</button>
       <span id="pageInfo">第 1 页</span>
@@ -169,6 +197,8 @@
 let allData=[],filteredData=[],searchFilteredData=[],currentBranch='全部',currentPage=1;
 const PAGE_SIZE=50;
 let barChartInst=null,pieChartInst=null;
+// 列下拉筛选状态
+let colFilters={branch:'',manager:'',scene:'',path:'',via:''};
 
 async function loadData(){
   try{
@@ -196,6 +226,7 @@ async function loadData(){
     document.getElementById('totalAll').textContent=allData.length.toLocaleString();
     buildFilterButtons();
     filterByBranch('全部');
+    buildColFilterOptions();
   }catch(e){
     document.body.innerHTML='<div style="padding:80px 20px;text-align:center;color:#ef4444;"><h3>数据加载失败</h3><p>'+e.message+'</p><p style="font-size:12px;color:#999;margin-top:8px;">请检查网络或稍后刷新重试</p></div>';
   }
@@ -227,27 +258,90 @@ function buildFilterButtons(){
 function filterByBranch(branch){
   currentBranch=branch;currentPage=1;
   filteredData=branch==='全部'?allData:allData.filter(r=>r.branch===branch);
-  searchFilteredData=[...filteredData];
+  // 重置列下拉筛选
+  colFilters={branch:'',manager:'',scene:'',path:'',via:''};
   document.querySelectorAll('.filter-btn').forEach(b=>{
     const isActive=(branch==='全部'&&b.textContent.startsWith('全部'))||b.textContent.startsWith(branch);
     b.classList.toggle('active',isActive);
   });
   document.getElementById('activeBranch').textContent=branch==='全部'?'全部':branch;
-  updateStats();updateCharts();updateTable();
+  updateStats();updateCharts();
+  buildColFilterOptions();
+  applyColFilters();
 }
 
 function doSearch(){
-  const q=document.getElementById('searchInput').value.trim().toLowerCase();
-  searchFilteredData=!q?[...filteredData]:filteredData.filter(r=>
-    r.customer.toLowerCase().includes(q)||
-    r.manager.toLowerCase().includes(q)||
-    r.sceneBig.toLowerCase().includes(q)||
-    r.path.toLowerCase().includes(q)
-  );
-  currentPage=1;updateTable();
+  currentPage=1;
+  applyColFilters();
 }
 
 document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+
+// ===== 列下拉筛选相关 =====
+function buildColFilterOptions(){
+  const base=filteredData;
+  function setOpts(selId,vals){
+    const sel=document.getElementById(selId);
+    const prev=sel.value;
+    sel.innerHTML='<option value="">全部</option>';
+    [...new Set(vals.filter(v=>v))].sort().forEach(v=>{
+      const o=document.createElement('option');
+      o.value=v;o.textContent=v;
+      sel.appendChild(o);
+    });
+    sel.value=prev;
+  }
+  setOpts('fBranch',base.map(r=>r.branch));
+  setOpts('fManager',base.map(r=>r.manager));
+  setOpts('fScene',base.map(r=>r.sceneBig));
+  setOpts('fPath',base.map(r=>r.path));
+  setOpts('fVia',base.map(r=>r.via));
+  // 若当前支局筛选已激活，则同步
+  if(currentBranch!=='全部'){
+    document.getElementById('fBranch').value=currentBranch;
+    colFilters.branch=currentBranch;
+  }
+}
+
+function applyColFilters(){
+  colFilters.branch=document.getElementById('fBranch').value;
+  colFilters.manager=document.getElementById('fManager').value;
+  colFilters.scene=document.getElementById('fScene').value;
+  colFilters.path=document.getElementById('fPath').value;
+  colFilters.via=document.getElementById('fVia').value;
+
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+
+  searchFilteredData=filteredData.filter(r=>{
+    if(colFilters.branch&&r.branch!==colFilters.branch)return false;
+    if(colFilters.manager&&r.manager!==colFilters.manager)return false;
+    if(colFilters.scene&&r.sceneBig!==colFilters.scene)return false;
+    if(colFilters.path&&r.path!==colFilters.path)return false;
+    if(colFilters.via&&r.via!==colFilters.via)return false;
+    if(q&&!(r.customer.toLowerCase().includes(q)||r.manager.toLowerCase().includes(q)||r.sceneBig.toLowerCase().includes(q)||r.path.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  currentPage=1;
+  updateTable();
+}
+
+function resetColFilters(){
+  document.getElementById('fBranch').value='';
+  document.getElementById('fManager').value='';
+  document.getElementById('fScene').value='';
+  document.getElementById('fPath').value='';
+  document.getElementById('fVia').value='';
+  document.getElementById('searchInput').value='';
+  colFilters={branch:'',manager:'',scene:'',path:'',via:''};
+  // 若当前支局筛选已激活，保留支局维度
+  if(currentBranch!=='全部'){
+    document.getElementById('fBranch').value=currentBranch;
+    colFilters.branch=currentBranch;
+  }
+  searchFilteredData=[...filteredData.filter(r=>!colFilters.branch||r.branch===colFilters.branch)];
+  currentPage=1;
+  updateTable();
+}
 
 function updateStats(){
   const c=filteredData.length;
@@ -317,6 +411,22 @@ function updateCharts(){
 function updateTable(){
   const total=searchFilteredData.length;
   document.getElementById('tableCount').textContent=total.toLocaleString();
+
+  // 计算汇总值（基于当前筛选结果）
+  const sumQty=searchFilteredData.reduce((a,r)=>a+r.qty,0);
+  const sumSales=searchFilteredData.reduce((a,r)=>a+r.sales,0);
+  const isFiltered=(colFilters.branch||colFilters.manager||colFilters.scene||colFilters.path||colFilters.via||document.getElementById('searchInput').value.trim());
+  // 汇总文字：筛选状态下显示筛选后的值，无筛选下显示全部filteredData的值
+  const baseQty=isFiltered?sumQty:filteredData.reduce((a,r)=>a+r.qty,0);
+  const baseSales=isFiltered?sumSales:filteredData.reduce((a,r)=>a+r.sales,0);
+  const summaryEl=document.getElementById('detailSummaryInline');
+  if(summaryEl){
+    const qtyStr=baseQty>=10000?(baseQty/10000).toFixed(1)+'万':baseQty.toFixed(1);
+    const salesStr=baseSales>=10000?(baseSales/10000).toFixed(2)+'万元':baseSales.toFixed(0)+'元';
+    summaryEl.innerHTML='｜ <span style="color:#94a3b8;font-size:11px;">实物量合计</span> <span style="color:#1a56db;font-weight:600;">'+qtyStr+'线</span>'
+      +'&nbsp;&nbsp;<span style="color:#94a3b8;font-size:11px;">销售额合计</span> <span style="color:#059669;font-weight:600;">'+salesStr+'</span>';
+  }
+
   if(total===0){
     document.getElementById('tableWrap').innerHTML='<div class="no-data"><div>无匹配数据</div></div>';
     document.getElementById('pagination').style.display='none';
