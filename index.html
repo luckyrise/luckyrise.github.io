@@ -182,6 +182,7 @@
       <div class="col-filter-item"><label>场景大类</label><select id="fScene" onchange="applyColFilters()"><option value="">全部</option></select></div>
       <div class="col-filter-item"><label>发展路径</label><select id="fPath" onchange="applyColFilters()"><option value="">全部</option></select></div>
       <div class="col-filter-item"><label>通过方式</label><select id="fVia" onchange="applyColFilters()"><option value="">全部</option></select></div>
+      <div class="col-filter-item"><label>月度</label><select id="fMonth" onchange="applyColFilters()"><option value="">全部</option></select></div>
       <button class="col-filter-reset" onclick="resetColFilters()">↺ 重置</button>
     </div>
     <div class="table-wrap" id="tableWrap"><div class="no-data"><div>数据加载中...</div></div></div>
@@ -198,7 +199,7 @@ let allData=[],filteredData=[],searchFilteredData=[],currentBranch='全部',curr
 const PAGE_SIZE=50;
 let barChartInst=null,pieChartInst=null;
 // 列下拉筛选状态
-let colFilters={branch:'',manager:'',scene:'',path:'',via:''};
+let colFilters={branch:'',manager:'',scene:'',path:'',via:'',month:''};
 
 async function loadData(){
   try{
@@ -207,6 +208,7 @@ async function loadData(){
     const json=await resp.json();
     allData=json.rows.map(r=>({
       date:r.DAT_DATE||'',
+      month:(r.DAT_DATE||'').substring(0,7),
       zone:r['落地区局']||'',
       branch:r['落地支局']||'(未知)',
       manager:r['促销客户经理']||'',
@@ -259,7 +261,7 @@ function filterByBranch(branch){
   currentBranch=branch;currentPage=1;
   filteredData=branch==='全部'?allData:allData.filter(r=>r.branch===branch);
   // 重置列下拉筛选
-  colFilters={branch:'',manager:'',scene:'',path:'',via:''};
+  colFilters={branch:'',manager:'',scene:'',path:'',via:'',month:''};
   document.querySelectorAll('.filter-btn').forEach(b=>{
     const isActive=(branch==='全部'&&b.textContent.startsWith('全部'))||b.textContent.startsWith(branch);
     b.classList.toggle('active',isActive);
@@ -296,6 +298,7 @@ function buildColFilterOptions(){
   setOpts('fScene',base.map(r=>r.sceneBig));
   setOpts('fPath',base.map(r=>r.path));
   setOpts('fVia',base.map(r=>r.via));
+  setOpts('fMonth',base.map(r=>r.month));
   // 若当前支局筛选已激活，则同步
   if(currentBranch!=='全部'){
     document.getElementById('fBranch').value=currentBranch;
@@ -309,6 +312,7 @@ function applyColFilters(){
   colFilters.scene=document.getElementById('fScene').value;
   colFilters.path=document.getElementById('fPath').value;
   colFilters.via=document.getElementById('fVia').value;
+  colFilters.month=document.getElementById('fMonth').value;
 
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
 
@@ -318,6 +322,7 @@ function applyColFilters(){
     if(colFilters.scene&&r.sceneBig!==colFilters.scene)return false;
     if(colFilters.path&&r.path!==colFilters.path)return false;
     if(colFilters.via&&r.via!==colFilters.via)return false;
+    if(colFilters.month&&r.month!==colFilters.month)return false;
     if(q&&!(r.customer.toLowerCase().includes(q)||r.manager.toLowerCase().includes(q)||r.sceneBig.toLowerCase().includes(q)||r.path.toLowerCase().includes(q)))return false;
     return true;
   });
@@ -331,8 +336,9 @@ function resetColFilters(){
   document.getElementById('fScene').value='';
   document.getElementById('fPath').value='';
   document.getElementById('fVia').value='';
+  document.getElementById('fMonth').value='';
   document.getElementById('searchInput').value='';
-  colFilters={branch:'',manager:'',scene:'',path:'',via:''};
+  colFilters={branch:'',manager:'',scene:'',path:'',via:'',month:''};
   // 若当前支局筛选已激活，保留支局维度
   if(currentBranch!=='全部'){
     document.getElementById('fBranch').value=currentBranch;
@@ -415,7 +421,7 @@ function updateTable(){
   // 计算汇总值（基于当前筛选结果）
   const sumQty=searchFilteredData.reduce((a,r)=>a+r.qty,0);
   const sumSales=searchFilteredData.reduce((a,r)=>a+r.sales,0);
-  const isFiltered=(colFilters.branch||colFilters.manager||colFilters.scene||colFilters.path||colFilters.via||document.getElementById('searchInput').value.trim());
+  const isFiltered=(colFilters.branch||colFilters.manager||colFilters.scene||colFilters.path||colFilters.via||colFilters.month||document.getElementById('searchInput').value.trim());
   // 汇总文字：筛选状态下显示筛选后的值，无筛选下显示全部filteredData的值
   const baseQty=isFiltered?sumQty:filteredData.reduce((a,r)=>a+r.qty,0);
   const baseSales=isFiltered?sumSales:filteredData.reduce((a,r)=>a+r.sales,0);
